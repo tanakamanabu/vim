@@ -61,11 +61,7 @@ endif
 """"""""""""""""""""""""""""""
 " Window位置の保存と復帰
 """"""""""""""""""""""""""""""
-if has('unix')
-  let s:infofile = '~/.vim/.vimpos'
-else
-  let s:infofile = '~/_vimpos'
-endif
+  let s:infofile = '~/.vimpos'
 
 function! s:SaveWindowParam(filename)
   redir => pos
@@ -98,7 +94,7 @@ unlet s:infofile
 "----------------------------------------
 "qfixapp
 "----------------------------------------
-set runtimepath+="c:/program files/vim/app/qfixapp"
+set runtimepath+="$VIM/app/qfixapp"
 
 "----------------------------------------
 "メニューアイテム作成
@@ -115,12 +111,3 @@ amenu <silent> 10.341 &File.更新時保存(&S)<Tab>:update  :if expand('%') == 
 amenu <silent> 10.400 &File.現バッファ差分表示(&D)<Tab>:DiffOrig  :DiffOrig<CR>
 amenu <silent> 10.401 &File.裏バッファと差分表示(&D)<Tab>:Diff\ #  :Diff #<CR>
 amenu <silent> 10.402 &File.差分表示(&D)<Tab>:Diff  :browse vertical diffsplit<CR>
-
-"文字コードと改行コードを表示する
-set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
-
-"初期ディレクトリをマイドキュメントに
-set directory=~/Documents
-
-"オートインデント有効
-set autoindent
