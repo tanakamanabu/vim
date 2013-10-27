@@ -11,6 +11,9 @@ set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V
 "オートインデント有効
 set autoindent
 
+"行番号を表示
+set number
+
 "======================================
 "NeoBundle
 set nocompatible
