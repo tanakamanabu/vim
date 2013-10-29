@@ -1,9 +1,8 @@
+*.swp
 /*
 /.*
 !/tmp
 !/tmp/dumy
-!/.vim
-!/.vim/bundle
 !/.vim/bundle/neobundle.vim
 !/.vim/bundle/neobundle.vim/*
 !/.gitignore

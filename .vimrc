@@ -36,5 +36,11 @@ NeoBundle 'scrooloose/syntastic.git'
 let g:syntastic_enable_signs=1
 let g:syntastic_auto_loc_list=2
 
+NeoBundle 'othree/eregex.vim.git'
+nnoremap / :M/
+nnoremap ? :M?
+nnoremap ,/ /
+nnoremap ,? ?
+
 filetype plugin on
 filetype indent on
