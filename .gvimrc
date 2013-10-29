@@ -15,11 +15,6 @@ if has('multi_byte_ime') || has('xim')
   endif
 endif
 
-" IMEの状態をカラー表示
-if has('multi_byte_ime')
-  highlight Cursor guifg=NONE guibg=Green
-  highlight CursorIM guifg=NONE guibg=Purple
-endif
 
 set showtabline=2 
 set encoding=utf-8
