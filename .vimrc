@@ -13,11 +13,14 @@ set autoindent "オートインデント有効
 set number "行番号を表示
 set autoread "更新されたら再読み込みする
 set list "特殊文字を表示する
-set listchars=eol:$,tab:>\ ,trail:c,extends:c,precedes:c "特殊文字を表示する
+set listchars=eol:↲,tab:>\ ,trail:c,extends:c,precedes:c "特殊文字を表示する
 highlight SpecialKey term=underline ctermfg=lightgray guifg=lightgray
 highlight NonText term=underline ctermfg=lightgray guifg=lightgray
 
+set scrolloff=8 "スクロール時視界を確保
+
 set cursorline "カーソル行を表示する
+set gdefault "検索時、全件検索がデフォルト
 highlight CursorLine cterm=underline ctermfg=NONE guifg=NONE ctermbg=lightgray guibg=lightgray
 
 set showmatch
@@ -101,9 +104,12 @@ NeoBundle 'kien/ctrlp.vim.git'
 NeoBundle 'scrooloose/syntastic.git'
 NeoBundle 'othree/eregex.vim.git'
 
-
 "Shougo/unite.vim.git
-	map 
+
+"NeoBundle 'glidenote/memolist.vim.git'
+map <Leader>ml :MemoList<CR>
+map <Leader>mc :MemoNew<CR>
+map <Leader>mg :MemoGrep<CR>
 
 "scrooloose/syntastic.git setting
 	let g:syntastic_enable_signs=1
