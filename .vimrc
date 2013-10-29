@@ -119,6 +119,5 @@ map <Leader>mg :MemoGrep<CR>
 	nnoremap / /\v
 	nnoremap ? ?\v
 
-
 filetype plugin on
 filetype indent on
