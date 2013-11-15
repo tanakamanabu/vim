@@ -64,6 +64,9 @@ set autoindent "オートインデント有効
 set number "行番号を表示
 set autoread "更新されたら再読み込みする
 set list "特殊文字を表示する
+set listchars=eol:↲,tab:>\ ,trail:c,extends:c,precedes:c "特殊文字を表示する
+highlight SpecialKey term=underline ctermfg=lightgray guifg=lightgray
+highlight NonText term=underline ctermfg=lightgray guifg=lightgray
 set listchars=eol:↲,tab:>\ ,trail:_,extends:_,precedes:_
 "highlight SpecialKey term=underline ctermfg=lightgray guifg=lightgray
 "highlight NonText term=underline ctermfg=lightgray guifg=lightgray
@@ -84,6 +87,7 @@ set tabstop=4 "タブサイズは２文字分
 set noexpandtab "タブ文字へ展開はしない
 set softtabstop=0 "ソフトタブは使わない
 "カレントディレクトリを開いたディレクトリにする
+au BufEnter * execute 'lcd ' fnameescape(expand('%:p:h'))
 "au BufEnter * execute ":lcd " . fnameescape(expand("%:p:h"))
 cd ~
 
@@ -139,6 +143,75 @@ map <silent> [Tag]n :tabnext<CR>
 map <silent> [Tag]p :tabprevious<CR>
 " tp 前のタブ
 
+"======================================
+"NeoBundle
+filetype off
 "vimrcを開くショートカット
 nnoremap <Space>. :<C-u>edit $MYVIMRC<CR>
+
+if has('vim_starting')
+  set runtimepath+=~/.vim/bundle/neobundle.vim
+  call neobundle#rc(expand('~/.vim/bundle'))
+endif
+
+NeoBundle 'Shougo/neocomplcache.git'
+NeoBundle 'Shougo/vimproc.git'
+NeoBundle 'Shougo/unite.vim.git'
+NeoBundle 'Shougo/vimfiler.git'
+NeoBundle 'Shougo/vimshell.git'
+NeoBundle 'vim-scripts/Align.git'
+NeoBundle 'glidenote/memolist.vim.git'
+NeoBundle 'kien/ctrlp.vim.git'
+NeoBundle 'scrooloose/syntastic.git'
+NeoBundle 'othree/eregex.vim.git'
+
+"Shougo/unite.vim.git
+
+"NeoBundle 'glidenote/memolist.vim.git'
+map <Leader>ml :MemoList<CR>
+map <Leader>mc :MemoNew<CR>
+map <Leader>mg :MemoGrep<CR>
+
+"scrooloose/syntastic.git setting
+	let g:syntastic_enable_signs=1
+	let g:syntastic_auto_loc_list=2
+"othree/eregex.vim.git setting
+	let g:eregex_default_enable = 0
+	nnoremap / /\v
+	nnoremap ? ?\v
+
+
+filetype plugin on
+filetype indent on
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
