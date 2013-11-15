@@ -183,35 +183,3 @@ map <Leader>mg :MemoGrep<CR>
 
 filetype plugin on
 filetype indent on
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

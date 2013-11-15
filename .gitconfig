@@ -4,3 +4,5 @@
 [push]
         devault = simple
         default = simple
+[gui]
+	recentrepo = G:/dev/apache/docs/mag.local-test.com/mag
