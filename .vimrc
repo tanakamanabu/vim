@@ -8,7 +8,6 @@ if has('vim_starting')
 endif
 
 NeoBundle 'Shougo/neocomplcache.git'
-NeoBundle 'Shougo/vimproc.git'
 NeoBundle 'Shougo/unite.vim.git'
 NeoBundle 'Shougo/vimfiler.git'
 NeoBundle 'Shougo/vimshell.git'
@@ -21,29 +20,55 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'open-browser.vim'
 NeoBundle 'renamer.vim'
 NeoBundle 'violetyk/cake.vim'
+NeoBundle 'Lokaltog/vim-easymotion'
+NeoBundle 'rhysd/clever-f.vim'
+
 
 NeoBundleCheck
-
-" eでファイラ起動
-execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple -winwidth=50 -no-quit<CR>'
 "VimFilerをデフォルトに設定する
 let g:vimfiler_as_default_explorer = 1
 
 "NeoBundle 'glidenote/memolist.vim.git'
-map <Leader>ml :MemoList<CR>
-map <Leader>mc :MemoNew<CR>
-map <Leader>mg :MemoGrep<CR>
+map <Space>ml :MemoList<CR>
+map <Space>mc :MemoNew<CR>
+map <Space>mg :MemoGrep<CR>
 
 "scrooloose/syntastic.git setting
-	let g:syntastic_enable_signs=1
+    let g:syntastic_enable_signs=1
 	let g:syntastic_auto_loc_list=2
 
 "othree/eregex.vim.git setting
 	let g:eregex_default_enable = 0
 
+" Lokaltog/vim-easymotion
+" http://blog.remora.cx/2012/08/vim-easymotion.html
+" ホームポジションに近いキーを使う
+let g:EasyMotion_keys='hjklasdfgyuiopqwertnmzxcvbHJKLASDFGYUIOPQWERTNMZXCVB'
+" 「;」 + 何かにマッピング
+let g:EasyMotion_leader_key=";"
+" 1 ストローク選択を優先する
+let g:EasyMotion_grouping=1
+" カラー設定変更
+hi EasyMotionTarget ctermbg=none ctermfg=red
+hi EasyMotionShade  ctermbg=none ctermfg=blue
 
 filetype plugin on
 filetype indent on
+
+" .で.vimrcを開く
+nnoremap <silent><Space>. :<C-u>edit $MYVIMRC<CR>
+
+" rでvimrcをリロードする
+nnoremap <silent><Space>r :source $MYVIMRC<CR>
+" eでファイラ起動
+execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple -winwidth=50 -no-quit<CR>'
+" bでUnite bookmark起動
+nnoremap <silent><Space>b :Unite bookmark<CR>
+" aでUniteBookmarkAdd
+nnoremap <silent><Space>a :UniteBookmarkAdd<CR>
+
+"ディレクトリのデフォルト動作をVimFilerにする
+autocmd FileType vimfiler call unite#custom_default_action('directory', 'cd')
 
 "検索するとき、正規表現のエスケープを最低限に very magic
 nnoremap / /\v
@@ -87,7 +112,7 @@ set tabstop=4 "タブサイズは２文字分
 set noexpandtab "タブ文字へ展開はしない
 set softtabstop=0 "ソフトタブは使わない
 "カレントディレクトリを開いたディレクトリにする
-au BufEnter * execute 'lcd ' fnameescape(expand('%:p:h'))
+au BufEnter * execute ":silent! lcd " . fnameescape(expand("%:p:h"))
 "au BufEnter * execute ":lcd " . fnameescape(expand("%:p:h"))
 cd ~
 
@@ -142,44 +167,6 @@ map <silent> [Tag]n :tabnext<CR>
 " tn 次のタブ
 map <silent> [Tag]p :tabprevious<CR>
 " tp 前のタブ
-
-"======================================
-"NeoBundle
-filetype off
-"vimrcを開くショートカット
-nnoremap <Space>. :<C-u>edit $MYVIMRC<CR>
-
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim
-  call neobundle#rc(expand('~/.vim/bundle'))
-endif
-
-NeoBundle 'Shougo/neocomplcache.git'
-NeoBundle 'Shougo/vimproc.git'
-NeoBundle 'Shougo/unite.vim.git'
-NeoBundle 'Shougo/vimfiler.git'
-NeoBundle 'Shougo/vimshell.git'
-NeoBundle 'vim-scripts/Align.git'
-NeoBundle 'glidenote/memolist.vim.git'
-NeoBundle 'kien/ctrlp.vim.git'
-NeoBundle 'scrooloose/syntastic.git'
-NeoBundle 'othree/eregex.vim.git'
-
-"Shougo/unite.vim.git
-
-"NeoBundle 'glidenote/memolist.vim.git'
-map <Leader>ml :MemoList<CR>
-map <Leader>mc :MemoNew<CR>
-map <Leader>mg :MemoGrep<CR>
-
-"scrooloose/syntastic.git setting
-	let g:syntastic_enable_signs=1
-	let g:syntastic_auto_loc_list=2
-"othree/eregex.vim.git setting
-	let g:eregex_default_enable = 0
-	nnoremap / /\v
-	nnoremap ? ?\v
-
 
 filetype plugin on
 filetype indent on
