@@ -7,4 +7,5 @@
 [gui]
 	recentrepo = G:/dev/apache/docs/mag.local-test.com/mag
 [core]
+	pager = lv -c
 	autocrlf = true
