@@ -7,7 +7,12 @@ if has('vim_starting')
   call neobundle#rc(expand('~/.vim/bundle'))
 endif
 
-NeoBundle 'Shougo/neocomplcache.git'
+"runtimepathには追加しないけど、neobundle.vimで更新する
+NeoBundleFetch "Shougo/neobundle.vim"
+
+"NeoBundleで管理してるプラグイン
+NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/unite.vim.git'
 NeoBundle 'Shougo/vimfiler.git'
 NeoBundle 'Shougo/vimshell.git'
@@ -20,18 +25,64 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'open-browser.vim'
 NeoBundle 'renamer.vim'
 NeoBundle 'violetyk/cake.vim'
-NeoBundle 'Lokaltog/vim-easymotion'
 NeoBundle 'rhysd/clever-f.vim'
+NeoBundle 'majutsushi/tagbar'
+NeoBundle 'alpaca-tc/alpaca_powertabline'
+NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim' }
+NeoBundle 'kana/vim-smartinput'
+NeoBundle 'cohama/vim-smartinput-endwise'
 
+"%拡張
+runtime macros/matchit.vim
 
 NeoBundleCheck
 "VimFilerをデフォルトに設定する
 let g:vimfiler_as_default_explorer = 1
 
+if neobundle#tap('vim-smartinput')
+  call neobundle#config({
+        \   'autoload' : {
+        \     'insert' : 1
+        \   }
+        \ })
+
+  function! neobundle#tapped.hooks.on_post_source(bundle)
+    call smartinput_endwise#define_default_rules()
+  endfunction
+
+  call neobundle#untap()
+endif
+
+if neobundle#tap('vim-smartinput-endwise')
+  function! neobundle#tapped.hooks.on_post_source(bundle)
+    " neosnippet and neocomplete compatible
+    call smartinput#map_to_trigger('i', '<Plug>(vimrc_cr)', '<Enter>', '<Enter>')
+    imap <expr><CR> !pumvisible() ? "\<Plug>(vimrc_cr)" :
+          \ neosnippet#expandable() ? "\<Plug>(neosnippet_expand)" :
+          \ neocomplete#close_popup()
+  endfunction
+  call neobundle#untap()
+endif
+
+
+"Neocompleteをデフォルトで有効にする
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_ignore_case = 1
+let g:neocomplete#enable_smart_case = 1
+if !exists('g:neocomplete#keyword_patterns')
+	let g:neocomplete#keyword_patterns = {}
+endif
+
+"Openbrowser設定
+let g:netrw_nogx = 1 "netrwのgxマッピングを無効化する
+nmap gx <Plug>(openbrowser-smart-search)
+vmap gx <Plug>(openbrowser-smart-search)
+
 "NeoBundle 'glidenote/memolist.vim.git'
 map <Space>ml :MemoList<CR>
 map <Space>mc :MemoNew<CR>
 map <Space>mg :MemoGrep<CR>
+
 
 "scrooloose/syntastic.git setting
     let g:syntastic_enable_signs=1
@@ -39,18 +90,6 @@ map <Space>mg :MemoGrep<CR>
 
 "othree/eregex.vim.git setting
 	let g:eregex_default_enable = 0
-
-" Lokaltog/vim-easymotion
-" http://blog.remora.cx/2012/08/vim-easymotion.html
-" ホームポジションに近いキーを使う
-let g:EasyMotion_keys='hjklasdfgyuiopqwertnmzxcvbHJKLASDFGYUIOPQWERTNMZXCVB'
-" 「;」 + 何かにマッピング
-let g:EasyMotion_leader_key=";"
-" 1 ストローク選択を優先する
-let g:EasyMotion_grouping=1
-" カラー設定変更
-hi EasyMotionTarget ctermbg=none ctermfg=red
-hi EasyMotionShade  ctermbg=none ctermfg=blue
 
 filetype plugin on
 filetype indent on
@@ -66,6 +105,22 @@ execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple
 nnoremap <silent><Space>b :Unite bookmark<CR>
 " aでUniteBookmarkAdd
 nnoremap <silent><Space>a :UniteBookmarkAdd<CR>
+" tでtagbar開く
+nnoremap <silent><Space>t :Tagbar<CR>
+
+"コマンドモード移行は頻度高いのでセミコロンで、ftFT繰り返しはShiftありきでいいや
+nnoremap ; :
+
+" <Ctrl + hl> で左右ウィンドウへ移動
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+
+"Tabで右ウィンドウ、Ctrl+Tabで左ウィンドウ
+nnoremap <Tab> <C-w>l
+nnoremap <C-Tab> <C-w>h
+
+"ZQは危険なのでナシで
+nnoremap ZQ <Nop>
 
 "ディレクトリのデフォルト動作をVimFilerにする
 autocmd FileType vimfiler call unite#custom_default_action('directory', 'cd')
@@ -73,6 +128,11 @@ autocmd FileType vimfiler call unite#custom_default_action('directory', 'cd')
 "検索するとき、正規表現のエスケープを最低限に very magic
 nnoremap / /\v
 nnoremap ? ?\v
+
+"coで縦連番自動置換
+nnoremap <silent> co :ContinuousNumber <C-a><CR>
+vnoremap <silent> co :ContinuousNumber <C-a><CR>
+command! -count -nargs=1 ContinuousNumber let snf=&nf|set nf-=octal|let cl = col('.')|for nc in range(1, <count>?<count>-line('.'):1)|exe 'normal! j'.nc.<q-args>|call cursor('.', cl)|endfor|unlet cl|unlet snf
 
 set nocompatible
 if has('gui_running') && !has('unix')
@@ -108,7 +168,8 @@ highlight CursorLine cterm=underline ctermfg=NONE guifg=NONE ctermbg=lightgray g
 set showmatch
 set browsedir=current "ファイラでカレントディレクトリを表示する
 set wildmode=longest:full "補完時に最長一致まで表示する
-set tabstop=4 "タブサイズは２文字分
+set tabstop=2 "タブサイズは２文字分
+set shiftwidth=2
 set noexpandtab "タブ文字へ展開はしない
 set softtabstop=0 "ソフトタブは使わない
 "カレントディレクトリを開いたディレクトリにする
@@ -151,22 +212,19 @@ let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
 set showtabline=2 " 常にタブラインを表示
 
 " The prefix key.
-nnoremap    [Tag]   <Nop>
-nmap    t [Tag]
 " Tab jump
+" :1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
 for n in range(1, 9)
-  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+  execute 'nnoremap <silent> :'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
-" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
-
-map <silent> [Tag]c :tablast <bar> tabnew<CR>
-" tc 新しいタブを一番右に作る
-map <silent> [Tag]d :tabclose<CR>
-" td タブを閉じる
-map <silent> [Tag]n :tabnext<CR>
-" tn 次のタブ
-map <silent> [Tag]p :tabprevious<CR>
-" tp 前のタブ
+" :c 新しいタブを一番右に作る
+nnoremap <silent> :c :tablast <bar> tabnew<CR>
+" :d タブを閉じる
+nnoremap <silent> :d :tabclose<CR>
+" :n 次のタブ
+nnoremap <silent> :n :tabnext<CR>
+" :p 前のタブ
+nnoremap <silent> :p :tabprevious<CR>
 
 filetype plugin on
 filetype indent on
