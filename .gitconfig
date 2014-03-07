@@ -8,5 +8,5 @@
 	recentrepo = G:/dev/apache/docs/mag.local-test.com/mag
 [core]
 	pager = lv -c
-	autocrlf = false
+	autocrlf = input
 	safecrlf = false
