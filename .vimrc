@@ -1,6 +1,31 @@
 "======================================
 "NeoBundle
 filetype off
+"NeoBundleのプラグインインストールディレクトリ
+let s:neobundle_plugins_dir = expand(exists("$VIM_NEOBUNDLE_PLUGIN_DIR") ? $VIM_NEOBUNDLE_PLUGIN_DIR : '~/.vim/bundle')
+
+"NeoBundleが入ってなかったらインストールする
+if !isdirectory(s:neobundle_plugins_dir."/neobundle.vim")
+	echo "Please install neobundle.vim."
+	function! s:install_neobundle()
+		if input("Install neobundle.vim? [Y/N] : ") =="Y"
+			if !isdirectory(s:neobundle_plugins_dir)
+				call mkdir(s:neobundle_plugins_dir, "p")
+			endif
+
+			execute "!git clone git://github.com/Shougo/neobundle.vim "
+						\ . s:neobundle_plugins_dir . "/neobundle.vim"
+			echo "neobundle installed. Please restart vim."
+		else
+			echo "Canceled."
+		endif
+	endfunction
+	augroup install-neobundle
+		autocmd!
+		autocmd VimEnter * call s:install_neobundle()
+	augroup END
+	finish
+endif
 
 if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
