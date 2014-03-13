@@ -56,6 +56,7 @@ NeoBundle 'alpaca-tc/alpaca_powertabline'
 NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim' }
 NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
+NeoBundle 'Shougo/vinarise'
 
 "%拡張
 runtime macros/matchit.vim
