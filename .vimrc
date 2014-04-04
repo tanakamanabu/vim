@@ -145,6 +145,12 @@ nnoremap <C-l> <C-w>l
 nnoremap <Tab> <C-w>l
 nnoremap <C-Tab> <C-w>h
 
+" hでヘッダへ移動
+nnoremap <silent><Space>h :<C-u>hide edit %<.h<CR>
+
+" cでCPPへ移動
+nnoremap <silent><Space>c :<C-u>hide edit %<.cpp<CR>
+
 "ZQは危険なのでナシで
 nnoremap ZQ <Nop>
 
