@@ -142,8 +142,10 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
 "Tabで右ウィンドウ、Ctrl+Tabで左ウィンドウ
+"ターミナル経由用に<ESC>[Aを割り当てておく
 nnoremap <Tab> <C-w>l
 nnoremap <C-Tab> <C-w>h
+nnoremap [A <C-w>h
 
 " hでヘッダへ移動
 nnoremap <silent><Space>h :<C-u>hide edit %<.h<CR>
