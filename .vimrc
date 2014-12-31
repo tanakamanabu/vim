@@ -1,4 +1,4 @@
-"======================================
+""======================================
 "NeoBundle
 filetype off
 "NeoBundleのプラグインインストールディレクトリ
@@ -27,13 +27,16 @@ if !isdirectory(s:neobundle_plugins_dir."/neobundle.vim")
 	finish
 endif
 
+
+
 if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
   call neobundle#rc(expand('~/.vim/bundle'))
 endif
 
-"runtimepathには追加しないけど、neobundle.vimで更新する
-NeoBundleFetch "Shougo/neobundle.vim"
+
+""runtimepathには追加しないけど、neobundle.vimで更新する
+"NeoBundleFetch "Shougo/neobundle.vim"
 
 "NeoBundleで管理してるプラグイン
 NeoBundle 'Shougo/neocomplete.vim'
@@ -43,27 +46,103 @@ NeoBundle 'Shougo/vimfiler.git'
 NeoBundle 'Shougo/vimshell.git'
 NeoBundle 'vim-scripts/Align.git'
 NeoBundle 'glidenote/memolist.vim.git'
-NeoBundle 'kien/ctrlp.vim.git'
-NeoBundle 'scrooloose/syntastic.git'
+"NeoBundle 'kien/ctrlp.vim.git'
+NeoBundle 'scrooloose/syntastic'
 NeoBundle 'othree/eregex.vim.git'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'open-browser.vim'
+"NeoBundle 'mattn/emmet-vim'
+"NeoBundle 'open-browser.vim'
 NeoBundle 'renamer.vim'
-NeoBundle 'violetyk/cake.vim'
+"NeoBundle 'violetyk/cake.vim'
 NeoBundle 'rhysd/clever-f.vim'
 NeoBundle 'majutsushi/tagbar'
-NeoBundle 'alpaca-tc/alpaca_powertabline'
-NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim' }
+"NeoBundle 'alpaca-tc/alpaca_powertabline'
+"NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim' }
+"NeoBundle 'bling/vim-airline'
+NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'kana/vim-smartinput'
 NeoBundle 'cohama/vim-smartinput-endwise'
+NeoBundle 'kana/vim-niceblock'
 NeoBundle 'Shougo/vinarise'
+NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'thinca/vim-singleton' "vimプロセスを１個に限定する
+NeoBundle 'taka-vagyok/prevent-win-closed.vim' "閉じないように
 
 "%拡張
 runtime macros/matchit.vim
 
 NeoBundleCheck
+
+"常駐化
+call singleton#enable()
+
+"qとかZZとかを弄ってVIMが閉じないようにする
+call preventwinclosed#enable()
+
 "VimFilerをデフォルトに設定する
 let g:vimfiler_as_default_explorer = 1
+
+
+"lightlineせってい
+let g:lightline = {
+        \ 'colorscheme': 'wombat',
+        \ 'mode_map': {'c': 'NORMAL'},
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ] ]
+        \ },
+        \ 'component_function': {
+        \   'modified': 'MyModified',
+        \   'readonly': 'MyReadonly',
+        \   'fugitive': 'MyFugitive',
+        \   'filename': 'MyFilename',
+        \   'fileformat': 'MyFileformat',
+        \   'filetype': 'MyFiletype',
+        \   'fileencoding': 'MyFileencoding',
+        \   'mode': 'MyMode'
+        \ }
+        \ }
+
+function! MyModified()
+  return &ft =~ 'help\|vimfiler\|gundo' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! MyReadonly()
+  return &ft !~? 'help\|vimfiler\|gundo' && &readonly ? 'x' : ''
+endfunction
+
+function! MyFilename()
+  return ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
+        \ (&ft == 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft == 'unite' ? unite#get_status_string() :
+        \  &ft == 'vimshell' ? vimshell#get_status_string() :
+        \ '' != expand('%:t') ? expand('%:t') : '[No Name]') .
+        \ ('' != MyModified() ? ' ' . MyModified() : '')
+endfunction
+
+function! MyFugitive()
+  try
+    if &ft !~? 'vimfiler\|gundo' && exists('*fugitive#head')
+      return fugitive#head()
+    endif
+  catch
+  endtry
+  return ''
+endfunction
+
+function! MyFileformat()
+  return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! MyFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! MyFileencoding()
+  return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! MyMode()
+  return winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
 
 if neobundle#tap('vim-smartinput')
   call neobundle#config({
@@ -120,6 +199,9 @@ map <Space>mg :MemoGrep<CR>
 filetype plugin on
 filetype indent on
 
+"クリップボード共有
+set clipboard=unnamed
+
 " .で.vimrcを開く
 nnoremap <silent><Space>. :<C-u>edit $MYVIMRC<CR>
 
@@ -128,9 +210,17 @@ nnoremap <silent><Space>r :source $MYVIMRC<CR>
 " eでファイラ起動
 execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple -winwidth=50 -no-quit<CR>'
 " bでUnite bookmark起動
-nnoremap <silent><Space>b :Unite bookmark<CR>
+nnoremap <silent><Space>b :Unite bookmark -vertical<CR>
 " aでUniteBookmarkAdd
 nnoremap <silent><Space>a :UniteBookmarkAdd<CR>
+" gでUniteGrep
+nnoremap <silent><Space>g :Unite grep -vertical<CR>
+" hで履歴表示
+nnoremap <silent><Space>h :Unite file_mru -vertical<CR>
+" 
+
+
+
 " tでtagbar開く
 nnoremap <silent><Space>t :Tagbar<CR>
 
@@ -169,9 +259,6 @@ vnoremap <silent> co :ContinuousNumber <C-a><CR>
 command! -count -nargs=1 ContinuousNumber let snf=&nf|set nf-=octal|let cl = col('.')|for nc in range(1, <count>?<count>-line('.'):1)|exe 'normal! j'.nc.<q-args>|call cursor('.', cl)|endfor|unlet cl|unlet snf
 
 set nocompatible
-if has('gui_running') && !has('unix')
-  set encoding=utf-8
-endif
 scriptencoding utf-8
 set encoding=utf-8
 set directory=~/tmp
@@ -247,18 +334,40 @@ set showtabline=2 " 常にタブラインを表示
 
 " The prefix key.
 " Tab jump
-" :1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
+" ;1 で1番左のタブ、;2 で1番左から2番目のタブにジャンプ
 for n in range(1, 9)
-  execute 'nnoremap <silent> :'.n  ':<C-u>tabnext'.n.'<CR>'
+  execute 'nnoremap <silent> ;'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
 " :c 新しいタブを一番右に作る
-nnoremap <silent> :c :tablast <bar> tabnew<CR>
+nnoremap <silent><Space>;c :tablast <bar> tabnew<CR>
 " :d タブを閉じる
-nnoremap <silent> :d :tabclose<CR>
+nnoremap <silent><Space>;d :tabclose<CR>
 " :n 次のタブ
-nnoremap <silent> :n :tabnext<CR>
+nnoremap <silent><Space>;n :tabnext<CR>
 " :p 前のタブ
-nnoremap <silent> :p :tabprevious<CR>
+nnoremap <silent><Space>;p :tabprevious<CR>
+
+"ZZで最後のタブなら保存してクリア、それ以外は保存して閉じる
+function! s:replace_zz()
+	if tabpagenr('$') == 1 && winnr('$') == 1
+		"タブページがないので保存してクリア
+		if expand("%") == ""
+			echo "名前をつけて下さい"
+		else 
+			write
+			enew
+		end
+	else
+		"通常のZZ
+		if expand("%") == ""
+			echo "名前をつけて下さい"
+		else 
+			write
+			quit
+		end
+	endif
+endfunction
+noremap ZZ :<C-u>call <SID>replace_zz()<CR>
 
 filetype plugin on
 filetype indent on
