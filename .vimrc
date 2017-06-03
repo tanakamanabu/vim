@@ -34,24 +34,31 @@ if has('vim_starting')
   call neobundle#end()
 endif
 
-
+call neobundle#begin(expand('~/.vim/bundle/'))
 ""runtimepathには追加しないけど、neobundle.vimで更新する
-"NeoBundleFetch "Shougo/neobundle.vim"
+NeoBundleFetch "Shougo/neobundle.vim"
 
 "NeoBundleで管理してるプラグイン
 NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'teramako/jscomplete-vim' "neocompleteと連動してJS補完賢く
 NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/unite.vim.git'
 NeoBundle 'Shougo/vimfiler.git'
 NeoBundle 'Shougo/vimshell.git'
+NeoBundle 'Shougo/neomru.vim'
+"NeoBundle 'Shougo/vimproc.git'
 NeoBundle 'vim-scripts/Align.git'
 NeoBundle 'glidenote/memolist.vim.git'
 "NeoBundle 'kien/ctrlp.vim.git'
 NeoBundle 'scrooloose/syntastic'
+NeoBundle 'jelera/vim-javascript-syntax'
+NeoBundle 'hail2u/vim-css3-syntax'
+NeoBundle 'othree/html5.vim'
 NeoBundle 'othree/eregex.vim.git'
 "NeoBundle 'mattn/emmet-vim'
 "NeoBundle 'open-browser.vim'
-NeoBundle 'renamer.vim'
+"NeoBundle 'renamer.vim'
+"NeoBundle 'glidenote/memolist.vim.git'
 "NeoBundle 'violetyk/cake.vim'
 NeoBundle 'rhysd/clever-f.vim'
 NeoBundle 'majutsushi/tagbar'
@@ -66,11 +73,26 @@ NeoBundle 'Shougo/vinarise'
 NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'thinca/vim-singleton' "vimプロセスを１個に限定する
 NeoBundle 'taka-vagyok/prevent-win-closed.vim' "閉じないように
+NeoBundle 'tpope/vim-fugitive' "Gxxxコマンド
+NeoBundle 'rhysd/committia.vim' "gitのコミットログ賢く
+NeoBundle 'kmnk/vim-unite-giti' "gitで検索したり
+NeoBundle 'idanarye/vim-merginal' "mergeとかbranch管理とか
+"windowsでAdministratorを有効にしてパスワードを設定するのは下記コマンド
+"net user administrator /active:yes
+"net user administrator *
+NeoBundle 'chrisbra/SudoEdit.vim' "sudo編集
+NeoBundle 'fuenor/im_control.vim' "IME制御
+NeoBundle 'nathanaelkane/vim-indent-guides' "インデントを見やすく
+NeoBundle 'terryma/vim-expand-region' "v連打で範囲拡大
+NeoBundle 'joonty/vdebug'
+
+NeoBundleCheck
+call neobundle#end()
+
 
 "%拡張
 runtime macros/matchit.vim
 
-NeoBundleCheck
 
 "常駐化
 call singleton#enable()
@@ -78,8 +100,17 @@ call singleton#enable()
 "qとかZZとかを弄ってVIMが閉じないようにする
 call preventwinclosed#enable()
 
+call unite#custom#profile('default','context',{
+			\'vertical_preview' : 1
+			\})
+
 "VimFilerをデフォルトに設定する
-let g:vimfiler_as_default_explorer = 1
+call vimfiler#custom#profile('default','context', {
+	\ 'explorer' : 1,
+	\ 'edit_action' : 'open',
+	\ 'split_action' : 'tabsplit',
+	\})
+let g:vimfiler_as_default_explorer=1
 
 
 "lightlineせってい
@@ -169,7 +200,6 @@ if neobundle#tap('vim-smartinput-endwise')
   call neobundle#untap()
 endif
 
-
 "Neocompleteをデフォルトで有効にする
 let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#enable_ignore_case = 1
@@ -177,17 +207,18 @@ let g:neocomplete#enable_smart_case = 1
 if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
 endif
+let g:neocomplete#enable_auto_select = 1
 
-"Openbrowser設定
-let g:netrw_nogx = 1 "netrwのgxマッピングを無効化する
-nmap gx <Plug>(openbrowser-smart-search)
-vmap gx <Plug>(openbrowser-smart-search)
+"tabで次候補,Shift-tabで前候補
+inoremap <expr><Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-"NeoBundle 'glidenote/memolist.vim.git'
+"jscomplete設定
+let g:jscomplete_use = ['dom', 'moz', 'es6th']
+
 map <Space>ml :MemoList<CR>
 map <Space>mc :MemoNew<CR>
 map <Space>mg :MemoGrep<CR>
-
 
 "scrooloose/syntastic.git setting
     let g:syntastic_enable_signs=1
@@ -210,7 +241,7 @@ nnoremap <silent><Space>r :source $MYVIMRC<CR>
 " eでファイラ起動
 execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple -winwidth=50 -no-quit<CR>'
 " bでUnite bookmark起動
-nnoremap <silent><Space>b :Unite bookmark -vertical<CR>
+nnoremap <silent><Space>b :Unite bookmark -winheight=8<CR>
 " aでUniteBookmarkAdd
 nnoremap <silent><Space>a :UniteBookmarkAdd<CR>
 " gでUniteGrep
@@ -218,8 +249,20 @@ nnoremap <silent><Space>g :Unite grep -vertical<CR>
 " hで履歴表示
 nnoremap <silent><Space>h :Unite file_mru -vertical<CR>
 " 
+" y
+nnoremap <silent><Space>y :Unite register<CR>
 
+"Uniteでカスタムアクション定義。vimfilerを開く
+let s:action = {
+\   'is_selectable' : 0,
+\}
 
+function! s:action.func(candidate)
+		execute 'VimFiler ' . a:candidate.word . ' -split -simple -winwidth=50 -no-quit'
+endfunction
+
+call unite#custom#action('directory', 'myvimfiler', s:action)
+unlet s:action
 
 " tでtagbar開く
 nnoremap <silent><Space>t :Tagbar<CR>
@@ -231,10 +274,10 @@ nnoremap ; :
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
-"Tabで右ウィンドウ、Ctrl+Tabで左ウィンドウ
+"Tabで右ウィンドウ、Shift+Tabで左ウィンドウ
 "ターミナル経由用に<ESC>[Aを割り当てておく
 nnoremap <Tab> <C-w>l
-nnoremap <C-Tab> <C-w>h
+nnoremap <S-Tab> <C-w>h
 nnoremap [A <C-w>h
 
 " hでヘッダへ移動
@@ -247,7 +290,7 @@ nnoremap <silent><Space>c :<C-u>hide edit %<.cpp<CR>
 nnoremap ZQ <Nop>
 
 "ディレクトリのデフォルト動作をVimFilerにする
-autocmd FileType vimfiler call unite#custom_default_action('directory', 'cd')
+call unite#custom#default_action('directory' , 'myvimfiler')
 
 "検索するとき、正規表現のエスケープを最低限に very magic
 nnoremap / /\v
@@ -262,6 +305,8 @@ set nocompatible
 scriptencoding utf-8
 set encoding=utf-8
 set directory=~/tmp
+set undodir=~/tmp/undo
+set backupdir=~/tmp/backup
 
 "文字コードと改行コードを表示する
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
@@ -288,14 +333,13 @@ highlight CursorLine cterm=underline ctermfg=NONE guifg=NONE ctermbg=lightgray g
 
 set showmatch
 set browsedir=current "ファイラでカレントディレクトリを表示する
-set wildmode=longest:full "補完時に最長一致まで表示する
+set wildmode=longest:full,full "補完時に最長一致まで表示する
 set tabstop=2 "タブサイズは２文字分
 set shiftwidth=2
 set noexpandtab "タブ文字へ展開はしない
 set softtabstop=0 "ソフトタブは使わない
 "カレントディレクトリを開いたディレクトリにする
 au BufEnter * execute ":silent! lcd " . fnameescape(expand("%:p:h"))
-"au BufEnter * execute ":lcd " . fnameescape(expand("%:p:h"))
 cd ~
 
 " IMEの状態をカラー表示
@@ -336,16 +380,16 @@ set showtabline=2 " 常にタブラインを表示
 " Tab jump
 " ;1 で1番左のタブ、;2 で1番左から2番目のタブにジャンプ
 for n in range(1, 9)
-  execute 'nnoremap <silent> ;'.n  ':<C-u>tabnext'.n.'<CR>'
+  execute 'nnoremap <silent><Space>'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
 " :c 新しいタブを一番右に作る
-nnoremap <silent><Space>;c :tablast <bar> tabnew<CR>
+nnoremap <silent><Space>c :tablast <bar> tabnew<CR>
 " :d タブを閉じる
-nnoremap <silent><Space>;d :tabclose<CR>
+nnoremap <silent><Space>d :tabclose<CR>
 " :n 次のタブ
-nnoremap <silent><Space>;n :tabnext<CR>
+nnoremap <silent><Space>n :tabnext<CR>
 " :p 前のタブ
-nnoremap <silent><Space>;p :tabprevious<CR>
+nnoremap <silent><Space>p :tabprevious<CR>
 
 "ZZで最後のタブなら保存してクリア、それ以外は保存して閉じる
 function! s:replace_zz()
@@ -356,6 +400,7 @@ function! s:replace_zz()
 		else 
 			write
 			enew
+			simalt ~n
 		end
 	else
 		"通常のZZ
@@ -369,5 +414,80 @@ function! s:replace_zz()
 endfunction
 noremap ZZ :<C-u>call <SID>replace_zz()<CR>
 
+if has('win32') || has('win64')
+	" Windowsの場合
+	inoremap <silent> <C-j> <C-^><C-r>=IMState('FixMode')<CR>
+elseif has('unix')
+	" unixでGVimの時だけ「日本語入力固定モード」を有効化する
+	if has('gui_running')
+		let IM_CtrlMode = 1
+		inoremap <silent> <C-j> <C-r>=IMState('FixMode')<CR>
+	else
+		let IM_CtrlMode = 0
+	endif
+endif
+
+
+"fugitiveのコマンドみたくMerginalを使いたい
+command! Gbranch :Merginal
+
+"v連打で範囲拡大
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+
 filetype plugin on
 filetype indent on
+
+"タブのラベル名を返す
+function! GuiTabLabel()
+	let l:label = '' " タブで表示する文字列の初期化
+	let l:bufnrlist = tabpagebuflist(v:lnum) " タブに含まれるバッファ情報
+
+	" 表示文字列にバッファ名を追加。ファイル名だけ
+	let l:bufname = fnamemodify(bufname(l:bufnrlist[tabpagewinnr(v:lnum) - 1]), ':t')
+
+	" バッファ名がないときは - で省略
+	let l:label .= l:bufname == '' ? '-' : l:bufname
+
+	" タブ内にウィンドウが複数あるときにはその数
+	let l:wincount = tabpagewinnr(v:lnum, '$')
+	if l:wincount > 1
+		let l:label .= '[' . l:wincount . ']'
+	endif
+
+	" 変更があったら+
+	for bufnr in l:bufnrlist
+		if getbufvar(bufnr, "&modified")
+			let l:label .= ' +'
+			break
+		endif
+	endfor
+	return l:label
+endfunction
+
+"タブのラベルカスタマイズ
+set guitablabel=%N:\ %{GuiTabLabel()}
+
+"独自コマンド集
+"2つのファイルをdiffする関数
+function! s:run_diff(left,right)
+	let wm = "!start "
+	let wm .= "\"C:\\Program Files\\WinMerge\\WinMergeU.exe\""
+	let wm .= " \"".a:left. "\""
+	let wm .= " \"".a:right. "\""
+	exec wm
+endfunction
+
+
+"windiffで自分と手前のバッファを比較する
+command! Dp call s:run_diff(expand("%:p"), bufname(bufnr("")-1))
+
+"windiffで自分と次のバッファを比較する
+command! Dn call s:run_diff(expand("%:p"), bufname(bufnr("")+1))
+
+"hostsを開く
+if has('win32') || has ('win64')
+	command! Hosts :e C:/windows/system32/Drivers/etc/hosts
+else 
+	command! Hosts :e /etc/hosts
+endif
