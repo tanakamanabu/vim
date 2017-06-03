@@ -6,6 +6,7 @@
 !.ideavimrc
 !.gitconfig
 !.gitmodules
+!dein.toml
 !tmp
 tmp/*
 !dummy

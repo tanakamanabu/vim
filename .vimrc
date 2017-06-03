@@ -1,104 +1,42 @@
 ""======================================
-"NeoBundle
+"Dein
 filetype off
-"NeoBundleのプラグインインストールディレクトリ
-let s:neobundle_plugins_dir = expand(exists("$VIM_NEOBUNDLE_PLUGIN_DIR") ? $VIM_NEOBUNDLE_PLUGIN_DIR : '~/.vim/bundle')
 
-"NeoBundleが入ってなかったらインストールする
-if !isdirectory(s:neobundle_plugins_dir."/neobundle.vim")
-	echo "Please install neobundle.vim."
-	function! s:install_neobundle()
-		if input("Install neobundle.vim? [Y/N] : ") =="Y"
-			if !isdirectory(s:neobundle_plugins_dir)
-				call mkdir(s:neobundle_plugins_dir, "p")
-			endif
-
-			execute "!git clone git://github.com/Shougo/neobundle.vim "
-						\ . s:neobundle_plugins_dir . "/neobundle.vim"
-			echo "neobundle installed. Please restart vim."
-		else
-			echo "Canceled."
-		endif
-	endfunction
-	augroup install-neobundle
-		autocmd!
-		autocmd VimEnter * call s:install_neobundle()
-	augroup END
-	finish
+if !&compatible
+  set nocompatible
 endif
 
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim
-  call neobundle#begin(expand('~/.vim/bundle/'))
-    NeoBundleFetch 'Shougo/neobundle.vim'
-  call neobundle#end()
+" reset augroup
+augroup MyAutoCmd
+  autocmd!
+augroup END
+
+" dein自体の自動インストール
+let s:cache_home = empty($XDG_CACHE_HOME) ? expand('~/.vim') : $XDG_CACHE_HOME
+let s:dein_dir = s:cache_home . '/dein'
+let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
+if !isdirectory(s:dein_repo_dir)
+  call system('git clone https://github.com/Shougo/dein.vim ' . shellescape(s:dein_repo_dir))
 endif
-
-call neobundle#begin(expand('~/.vim/bundle/'))
-""runtimepathには追加しないけど、neobundle.vimで更新する
-NeoBundleFetch "Shougo/neobundle.vim"
-
-"NeoBundleで管理してるプラグイン
-NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'teramako/jscomplete-vim' "neocompleteと連動してJS補完賢く
-NeoBundle 'Shougo/neosnippet'
-NeoBundle 'Shougo/unite.vim.git'
-NeoBundle 'Shougo/vimfiler.git'
-NeoBundle 'Shougo/vimshell.git'
-NeoBundle 'Shougo/neomru.vim'
-"NeoBundle 'Shougo/vimproc.git'
-NeoBundle 'vim-scripts/Align.git'
-NeoBundle 'glidenote/memolist.vim.git'
-"NeoBundle 'kien/ctrlp.vim.git'
-NeoBundle 'scrooloose/syntastic'
-NeoBundle 'jelera/vim-javascript-syntax'
-NeoBundle 'hail2u/vim-css3-syntax'
-NeoBundle 'othree/html5.vim'
-NeoBundle 'othree/eregex.vim.git'
-"NeoBundle 'mattn/emmet-vim'
-"NeoBundle 'open-browser.vim'
-"NeoBundle 'renamer.vim'
-"NeoBundle 'glidenote/memolist.vim.git'
-"NeoBundle 'violetyk/cake.vim'
-NeoBundle 'rhysd/clever-f.vim'
-NeoBundle 'majutsushi/tagbar'
-"NeoBundle 'alpaca-tc/alpaca_powertabline'
-"NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim' }
-"NeoBundle 'bling/vim-airline'
-NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'kana/vim-smartinput'
-NeoBundle 'cohama/vim-smartinput-endwise'
-NeoBundle 'kana/vim-niceblock'
-NeoBundle 'Shougo/vinarise'
-NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'thinca/vim-singleton' "vimプロセスを１個に限定する
-NeoBundle 'taka-vagyok/prevent-win-closed.vim' "閉じないように
-NeoBundle 'tpope/vim-fugitive' "Gxxxコマンド
-NeoBundle 'rhysd/committia.vim' "gitのコミットログ賢く
-NeoBundle 'kmnk/vim-unite-giti' "gitで検索したり
-NeoBundle 'idanarye/vim-merginal' "mergeとかbranch管理とか
-"windowsでAdministratorを有効にしてパスワードを設定するのは下記コマンド
-"net user administrator /active:yes
-"net user administrator *
-NeoBundle 'chrisbra/SudoEdit.vim' "sudo編集
-NeoBundle 'fuenor/im_control.vim' "IME制御
-NeoBundle 'nathanaelkane/vim-indent-guides' "インデントを見やすく
-NeoBundle 'terryma/vim-expand-region' "v連打で範囲拡大
-NeoBundle 'joonty/vdebug'
-
-NeoBundleCheck
-call neobundle#end()
-
+let &runtimepath = s:dein_repo_dir .",". &runtimepath
+" プラグイン読み込み＆キャッシュ作成
+let s:toml_file = fnamemodify(expand('<sfile>'), ':h').'/dein.toml'
+if dein#load_state(s:dein_dir)
+  call dein#begin(s:dein_dir)
+  call dein#load_toml(s:toml_file)
+  call dein#end()
+  call dein#save_state()
+endif
+" 不足プラグインの自動インストール
+if has('vim_starting') && dein#check_install()
+  call dein#install()
+endif
 
 "%拡張
 runtime macros/matchit.vim
 
-
 "常駐化
 call singleton#enable()
-
-"qとかZZとかを弄ってVIMが閉じないようにする
-call preventwinclosed#enable()
 
 call unite#custom#profile('default','context',{
 			\'vertical_preview' : 1
@@ -174,31 +112,6 @@ endfunction
 function! MyMode()
   return winwidth(0) > 60 ? lightline#mode() : ''
 endfunction
-
-if neobundle#tap('vim-smartinput')
-  call neobundle#config({
-        \   'autoload' : {
-        \     'insert' : 1
-        \   }
-        \ })
-
-  function! neobundle#tapped.hooks.on_post_source(bundle)
-    call smartinput_endwise#define_default_rules()
-  endfunction
-
-  call neobundle#untap()
-endif
-
-if neobundle#tap('vim-smartinput-endwise')
-  function! neobundle#tapped.hooks.on_post_source(bundle)
-    " neosnippet and neocomplete compatible
-    call smartinput#map_to_trigger('i', '<Plug>(vimrc_cr)', '<Enter>', '<Enter>')
-    imap <expr><CR> !pumvisible() ? "\<Plug>(vimrc_cr)" :
-          \ neosnippet#expandable() ? "\<Plug>(neosnippet_expand)" :
-          \ neocomplete#close_popup()
-  endfunction
-  call neobundle#untap()
-endif
 
 "Neocompleteをデフォルトで有効にする
 let g:neocomplete#enable_at_startup = 1

@@ -1,0 +1,110 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+repo = 'Shougo/neocomplete.vim'
+
+[[plugins]]
+repo = 'mattn/jscomplete-vim' #neocompleteと連動してJS補完賢く
+
+[[plugins]]
+repo = 'Shougo/neosnippet'
+
+[[plugins]]
+repo = 'Shougo/unite.vim.git'
+
+[[plugins]]
+repo = 'Shougo/vimfiler.git'
+
+[[plugins]]
+repo = 'Shougo/vimshell.git'
+
+[[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
+repo = 'vim-scripts/Align.git'
+
+[[plugins]]
+repo = 'glidenote/memolist.vim.git'
+
+[[plugins]]
+repo = 'scrooloose/syntastic'
+
+[[plugins]]
+repo = 'jelera/vim-javascript-syntax'
+
+[[plugins]]
+repo = 'hail2u/vim-css3-syntax'
+
+[[plugins]]
+repo = 'othree/html5.vim'
+
+[[plugins]]
+repo = 'othree/eregex.vim.git'
+
+[[plugins]]
+repo = 'rhysd/clever-f.vim'
+
+[[plugins]]
+repo = 'majutsushi/tagbar'
+
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+
+[[plugins]]
+repo = 'kana/vim-smartinput'
+
+[[plugins]]
+repo = 'cohama/vim-smartinput-endwise'
+
+[[plugins]]
+repo = 'kana/vim-niceblock'
+
+[[plugins]]
+repo = 'Shougo/vinarise'
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
+repo = 'thinca/vim-singleton' #vimプロセスを１個に限定する
+
+[[plugins]]
+repo = 'taka-vagyok/prevent-win-closed.vim' #閉じないように
+
+[[plugins]]
+repo = 'tpope/vim-fugitive' #Gxxxコマンド
+
+[[plugins]]
+repo = 'rhysd/committia.vim' #gitのコミットログ賢く
+
+[[plugins]]
+repo = 'kmnk/vim-unite-giti' #gitで検索したり
+
+[[plugins]]
+repo = 'idanarye/vim-merginal' #mergeとかbranch管理とか
+
+[[plugins]]
+repo = 'chrisbra/SudoEdit.vim' #sudo編集
+#windowsでAdministratorを有効にしてパスワードを設定するのは下記コマンド
+#net user administrator /active:yes
+#net user administrator *
+
+[[plugins]]
+repo = 'fuenor/im_control.vim' #IME制御
+
+[[plugins]]
+repo = 'nathanaelkane/vim-indent-guides' #インデントを見やすく
+
+[[plugins]]
+repo = 'terryma/vim-expand-region' #v連打で範囲拡大
+
+[[plugins]]
+repo = 'joonty/vdebug'
+
+[[plugins]]
+repo = 'fatih/vim-go'
+
+[[plugins]]
+repo = 'gregsexton/gitv'
