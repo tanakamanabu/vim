@@ -221,6 +221,10 @@ set directory=~/tmp
 set undodir=~/tmp/undo
 set backupdir=~/tmp/backup
 
+if has('win32') || has('win64')
+	let $TMP = $HOME . "\\tmp"
+endif
+
 "文字コードと改行コードを表示する
 set statusline=%<%f\ %m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).']['.&ff.']'}%=%l,%c%V%8P
 
@@ -325,7 +329,10 @@ function! s:replace_zz()
 		end
 	endif
 endfunction
-noremap ZZ :<C-u>call <SID>replace_zz()<CR>
+
+if has('win32') || has('win64')
+	noremap ZZ :<C-u>call <SID>replace_zz()<CR>
+endif
 
 if has('win32') || has('win64')
 	" Windowsの場合
