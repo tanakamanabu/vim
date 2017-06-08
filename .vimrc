@@ -411,3 +411,7 @@ if has('win32') || has ('win64')
 else 
 	command! Hosts :e /etc/hosts
 endif
+
+
+"Previm open
+au BufRead,BufNewFile *.md set filetype=markdown

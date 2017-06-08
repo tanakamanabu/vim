@@ -108,3 +108,12 @@ repo = 'fatih/vim-go'
 
 [[plugins]]
 repo = 'gregsexton/gitv'
+
+[[plugins]]
+repo = 'kannokanno/previm'
+
+[[plugins]]
+repo = 'plasticboy/vim-markdown'
+
+[[plugins]]
+repo = 'tyru/open-browser.vim'
