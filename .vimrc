@@ -152,15 +152,24 @@ nnoremap <silent><Space>. :<C-u>edit $MYVIMRC<CR>
 " rでvimrcをリロードする
 nnoremap <silent><Space>r :source $MYVIMRC<CR>
 " eでファイラ起動
-execute 'nnoremap <silent><Space>e :VimFiler ' . expand("%:h"). ' -split -simple -winwidth=50 -no-quit<CR>'
+nnoremap <silent><Space>e :VimFilerExplorer<CR>
+nnoremap <silent><Space>E :<C-u>call <SID>open_explorer()<CR>
+nnoremap <silent><Space>f :<C-u>call <SID>open_filer()<CR>
+function! s:open_explorer()
+	execute 'VimFilerExplorer ' . expand("%:p:h")
+endfunction
+
+function! s:open_filer()
+	execute 'VimFilerSplit '.expand("%:p:h").' -winwidth=50 -no-quit'
+endfunction
+
+
 " bでUnite bookmark起動
 nnoremap <silent><Space>b :Unite bookmark -winheight=8<CR>
 " aでUniteBookmarkAdd
 nnoremap <silent><Space>a :UniteBookmarkAdd<CR>
 " gでUniteGrep
 nnoremap <silent><Space>g :Unite grep -vertical<CR>
-" hで履歴表示
-nnoremap <silent><Space>h :Unite file_mru -vertical<CR>
 " 
 " y
 nnoremap <silent><Space>y :Unite register<CR>
@@ -178,20 +187,22 @@ call unite#custom#action('directory', 'myvimfiler', s:action)
 unlet s:action
 
 " tでtagbar開く
-nnoremap <silent><Space>t :Tagbar<CR>
+nnoremap <silent><Space>t :TagbarToggle<CR>
 
 "コマンドモード移行は頻度高いのでセミコロンで、ftFT繰り返しはShiftありきでいいや
 nnoremap ; :
 
-" <Ctrl + hl> で左右ウィンドウへ移動
+" <Ctrl + hljk> で上下左右ウィンドウへ移動
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
 
-"Tabで右ウィンドウ、Shift+Tabで左ウィンドウ
+"Tabで次ウィンドウ、Shift+Tabで前ウィンドウ
 "ターミナル経由用に<ESC>[Aを割り当てておく
-nnoremap <Tab> <C-w>l
-nnoremap <S-Tab> <C-w>h
-nnoremap [A <C-w>h
+nnoremap <Tab> <C-w>w
+nnoremap <S-Tab> <C-w>W
+nnoremap [A <C-w>w
 
 " hでヘッダへ移動
 nnoremap <silent><Space>h :<C-u>hide edit %<.h<CR>
@@ -201,6 +212,10 @@ nnoremap <silent><Space>c :<C-u>hide edit %<.cpp<CR>
 
 "ZQは危険なのでナシで
 nnoremap ZQ <Nop>
+
+" 行頭行末へ移動はデフォだと使いにくいので置き換える
+nnoremap <silent><Space>h ^
+nnoremap <silent><Space>l $
 
 "ディレクトリのデフォルト動作をVimFilerにする
 call unite#custom#default_action('directory' , 'myvimfiler')
@@ -295,17 +310,15 @@ set showtabline=2 " 常にタブラインを表示
 
 " The prefix key.
 " Tab jump
-" ;1 で1番左のタブ、;2 で1番左から2番目のタブにジャンプ
+" 1 で1番左のタブ、;2 で1番左から2番目のタブにジャンプ
 for n in range(1, 9)
   execute 'nnoremap <silent><Space>'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
-" :c 新しいタブを一番右に作る
+" c 新しいタブを一番右に作る
 nnoremap <silent><Space>c :tablast <bar> tabnew<CR>
-" :d タブを閉じる
-nnoremap <silent><Space>d :tabclose<CR>
-" :n 次のタブ
+" n 次のタブ
 nnoremap <silent><Space>n :tabnext<CR>
-" :p 前のタブ
+" p 前のタブ
 nnoremap <silent><Space>p :tabprevious<CR>
 
 "ZZで最後のタブなら保存してクリア、それ以外は保存して閉じる
@@ -360,7 +373,8 @@ filetype indent on
 
 "タブのラベル名を返す
 function! GuiTabLabel()
-	let l:label = '' " タブで表示する文字列の初期化
+	let l:label = tabpagenr()."{".bufnr("%")."}" "タブ番号(バッファ番号:
+
 	let l:bufnrlist = tabpagebuflist(v:lnum) " タブに含まれるバッファ情報
 
 	" 表示文字列にバッファ名を追加。ファイル名だけ
@@ -372,7 +386,7 @@ function! GuiTabLabel()
 	" タブ内にウィンドウが複数あるときにはその数
 	let l:wincount = tabpagewinnr(v:lnum, '$')
 	if l:wincount > 1
-		let l:label .= '[' . l:wincount . ']'
+		let l:label .= '[' . tabpagewinnr(v:lnum).'/'.l:wincount . ']'
 	endif
 
 	" 変更があったら+
@@ -386,24 +400,24 @@ function! GuiTabLabel()
 endfunction
 
 "タブのラベルカスタマイズ
-set guitablabel=%N:\ %{GuiTabLabel()}
+set guitablabel=\ %{GuiTabLabel()}
 
 "独自コマンド集
 "2つのファイルをdiffする関数
 function! s:run_diff(left,right)
-	let wm = "!start "
-	let wm .= "\"C:\\Program Files\\WinMerge\\WinMergeU.exe\""
-	let wm .= " \"".a:left. "\""
-	let wm .= " \"".a:right. "\""
+	let wm = '!start '
+	let wm .= '"C:\\Program Files\\WinMerge\\WinMergeU.exe"'
+	let wm .= ' "'.a:left. '"'
+	let wm .= ' "'.a:right. '"'
 	exec wm
 endfunction
 
 
 "windiffで自分と手前のバッファを比較する
-command! Dp call s:run_diff(expand("%:p"), bufname(bufnr("")-1))
+command! Dp call s:run_diff('%:p', '#' . (bufnr('')-1) . ':p')
 
 "windiffで自分と次のバッファを比較する
-command! Dn call s:run_diff(expand("%:p"), bufname(bufnr("")+1))
+command! Dn call s:run_diff('%:p', '#' . (bufnr('')+1) . ':p')
 
 "hostsを開く
 if has('win32') || has ('win64')
@@ -412,6 +426,9 @@ else
 	command! Hosts :e /etc/hosts
 endif
 
+"Golang
+nnoremap <silent>gr :w<CR>:GoRun<CR>
+nnoremap <silent>gt :w<CR>:GoTest<CR>
 
 "Previm open
 au BufRead,BufNewFile *.md set filetype=markdown
