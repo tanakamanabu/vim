@@ -1,0 +1,6 @@
+"クリップボード共有
+set clipboard=unnamed
+
+set autoindent "オートインデント有効
+set number "行番号を表示
+set list "特殊文字を表示する
