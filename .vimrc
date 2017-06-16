@@ -429,6 +429,7 @@ endif
 "Golang
 nnoremap <silent>gr :w<CR>:GoRun<CR>
 nnoremap <silent>gt :w<CR>:GoTest<CR>
+nnoremap <silent>gi :w<CR>:GoImports<CR>
 
 "Previm open
 au BufRead,BufNewFile *.md set filetype=markdown
