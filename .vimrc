@@ -121,6 +121,7 @@ if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#enable_auto_select = 1
+set completeopt -=preview
 
 "tabで次候補,Shift-tabで前候補
 inoremap <expr><Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
@@ -163,6 +164,10 @@ function! s:open_filer()
 	execute 'VimFilerSplit '.expand("%:p:h").' -winwidth=50 -no-quit'
 endfunction
 
+"num oでnum行目のファイルを開く（左端にvimfilerが開いてるとき）
+map <expr><Space>o "<C-W><C-T>gg".(v:count <=1 ? "" : (v:count-1)."j")."e"
+
+
 
 " bでUnite bookmark起動
 nnoremap <silent><Space>b :Unite bookmark -winheight=8<CR>
@@ -186,10 +191,13 @@ endfunction
 call unite#custom#action('directory', 'myvimfiler', s:action)
 unlet s:action
 
-" tでtagbar開く
+" tでtagbar開く行番号表示する
 nnoremap <silent><Space>t :TagbarToggle<CR>
+let g:tagbar_show_linenumbers = 1
+"num jでnum行目の実装にジャンプする
+map <expr><Space>j "<C-W><C-B>gg".(v:count <=1 ? "" : (v:count-1)."j")."<CR>"
 
-"コマンドモード移行は頻度高いのでセミコロンで、ftFT繰り返しはShiftありきでいいや
+"コマンドモード移行は頻度高いのでセミコロンで
 nnoremap ; :
 
 " <Ctrl + hljk> で上下左右ウィンドウへ移動
